@@ -9,7 +9,7 @@ api = Api(app)
 class PersonListApi(Resource):
     """docstring for PersonList"""
     def get(self):
-        pass
+        return {'greeting': 'Hello'}
 
     def post(self):
         pass

@@ -1,5 +1,6 @@
 Family Tree
 
+
 A person has a mother
 A person has a father
 A person can have zero or more siblings
@@ -204,6 +205,7 @@ MATCH (a:Person)<-[r1:FATHER_OF|MOTHER_OF]-(p:Person)-[r2:FATHER_OF|MOTHER_OF]->
 MATCH (a:Person)<-[r1:FATHER_OF|MOTHER_OF]-(p:Person)-[r2:FATHER_OF|MOTHER_OF]->(b:Person) WHERE p.firstname IN ['Irvin','Myrtle'] MERGE (a)-[r3:SIBLING_OF]-(b);
 
 More QUESTIONS:
+
 Who are my brothers?
 MATCH (a:Person)-[r:SIBLING_OF]-(b:Person {sex:'M'}) WHERE a.firstname='Emily' RETURN b.firstname;
 MATCH (a:Person)-[r:SIBLING_OF]-(b:Person {sex:'M'}) WHERE a.firstname='Ryan' RETURN a.firstname as Me, b.firstname as Brothers;
@@ -213,3 +215,37 @@ MATCH (a:Person)-[r:SIBLING_OF]-(b:Person {sex:'F'}) WHERE a.firstname='Ryan' RE
 
 Who are my siblings?
 MATCH (a:Person)-[r:SIBLING_OF]-(b:Person) WHERE a.firstname='Jamie' RETURN a.firstname as Me, b.firstname as Siblings;
+
+Who is my grandpa?
+MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)<-[:FATHER_OF]-(r:Person) WHERE n.firstname='Ryan' RETURN n.firstname, r.firstname as grandpa;
+
+Who is my grandma?
+MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)<-[:MOTHER_OF]-(r:Person) WHERE n.firstname='Ryan' RETURN n.firstname, r.firstname as grandma;
+
+Who is my grandparents?
+MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)<-[:FATHER_OF|MOTHER_OF]-(r:Person) WHERE n.firstname='Ryan' RETURN n.firstname, r.firstname as grandparent;
+
+Who is my uncles?
+MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)-[:SIBLING_OF]-(r:Person {sex:'M'}) WHERE n.firstname='Ryan' RETURN n.firstname, r.firstname as uncle;
+
+DATA:
+Create (p:Person {firstname:'Eustin', lastname:'Elie', dob:-22420800, sex:'M'});
+Create (p:Person {firstname:'Calem', lastname:'Elie', dob:-22420800, sex:'M'});
+Create (p:Person {firstname:'Ethan', lastname:'Elie', dob:-22420800, sex:'M'});
+Create (p:Person {firstname:'Corbin', lastname:'Elie', dob:-22420800, sex:'M'});
+Create (p:Person {firstname:'Nazley', lastname:'Elie', dob:-22420800, sex:'F'});
+Match (n:Person {firstname:'Eustin'}), (b:Person {firstname:'Calem'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Eustin'}), (b:Person {firstname:'Ethan'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Eustin'}), (b:Person {firstname:'Corbin'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Nazley'}), (b:Person {firstname:'Calem'}) merge (n)-[:MOTHER_OF]->(b);
+Match (n:Person {firstname:'Nazley'}), (b:Person {firstname:'Ethan'}) merge (n)-[:MOTHER_OF]->(b);
+Match (n:Person {firstname:'Nazley'}), (b:Person {firstname:'Corbin'}) merge (n)-[:MOTHER_OF]->(b);
+MATCH (a:Person)<-[r1:FATHER_OF|MOTHER_OF]-(p:Person)-[r2:FATHER_OF|MOTHER_OF]->(b:Person) WHERE p.firstname IN ['Eustin','Nazley'] MERGE (a)-[r3:SIBLING_OF]-(b);
+Match (n:Person {firstname:'Irvin'}), (b:Person {firstname:'Eustin'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Myrtle'}), (b:Person {firstname:'Eustin'}) merge (n)-[:MOTHER_OF]->(b);
+Create (p:Person {firstname:'Lynne', lastname:'Elie', dob:705412800, sex:'F'});
+Match (n:Person {firstname:'Irvin'}), (b:Person {firstname:'Lynne'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Myrtle'}), (b:Person {firstname:'Lynne'}) merge (n)-[:MOTHER_OF]->(b);
+
+Who are my cousins?
+MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)-[:SIBLING_OF]-(r:Person)-[:FATHER_OF|MOTHER_OF]->(s:Person) WHERE n.firstname='Ryan' RETURN n.firstname, s.firstname as cousins;
