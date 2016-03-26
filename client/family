@@ -31,7 +31,6 @@ Questions
 
 Sample Dataset
 
-Gavin dob -80827200
 Irvin dob -800798400
 Mrtle dob -674913600
 Lester dob 19828800
@@ -249,3 +248,6 @@ Match (n:Person {firstname:'Myrtle'}), (b:Person {firstname:'Lynne'}) merge (n)-
 
 Who are my cousins?
 MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)-[:SIBLING_OF]-(r:Person)-[:FATHER_OF|MOTHER_OF]->(s:Person) WHERE n.firstname='Ryan' RETURN n.firstname, s.firstname as cousins;
+
+//Return all persons in the db
+match (p:Person) return p.firstname + ' ' + p.lastname as Name order by p.firstname, p.lastname;

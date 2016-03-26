@@ -1,9 +1,16 @@
 Person web service
 
 Services exposed in the api:
-uri: http://localhost:5000/family/api/v1.0/persons
-    list all persons
-    get a specific person
-    create a person
-    modify a person
-    delete a person
+
+Persons details:
+	uri: http://localhost:5000/family/api/v1.0/persons
+		GET - List all people
+		POST - Add a person
+
+Person details:
+	uri: http://localhost:5000/family/api/v1.0/persons/<int:id>
+  	GET -a specific person (graph relationships ??)
+  	POST - Add a parent (existing person)
+  	POST - Add a sibling (existing person)
+  	PUT - Modify a person (add/edit/remove attributes)
+    DELETE - Remove a person

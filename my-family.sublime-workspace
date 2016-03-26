@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"del",
+				"delete_all	function"
+			],
+			[
 				"impor",
 				"import	keyword"
 			],
@@ -23,10 +27,38 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 148.0,
-		"last_filter": "for se",
+		"height": 262.0,
+		"last_filter": "li",
 		"selected_items":
 		[
+			[
+				"li",
+				"Package Control: List Packages"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"list",
+				"Package Control: List Packages"
+			],
 			[
 				"for se",
 				"TypeScript: Format Selection"
@@ -34,14 +66,6 @@
 			[
 				"for",
 				"TypeScript: Format Block"
-			],
-			[
-				"inst",
-				"Package Control: Install Package"
-			],
-			[
-				"in",
-				"Package Control: Install Package"
 			]
 		],
 		"width": 453.0
@@ -66,10 +90,19 @@
 	},
 	"expanded_folders":
 	[
-		"/home/gelie/Projects/my-family"
+		"/home/gelie/Projects/my-family",
+		"/home/gelie/Projects/my-family/client",
+		"/home/gelie/Projects/my-family/server"
 	],
 	"file_history":
 	[
+		"/home/gelie/Projects/my-family/server/api.design",
+		"/home/gelie/Projects/my-family/server/app.py",
+		"/home/gelie/Projects/my-family/client/family",
+		"/home/gelie/Projects/my-family/create_db_sample_data.py",
+		"/home/gelie/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/gelie/.config/sublime-text-3/Packages/User/SublimeLinter.sublime-settings",
+		"/home/gelie/.config/sublime-text-3/Packages/User/JSON.sublime-settings",
 		"/home/gelie/Projects/ang2-toh/index.html",
 		"/home/gelie/Projects/ang2-fam/index.html",
 		"/home/gelie/Projects/ang2-fam/app/app.component.ts",
@@ -80,12 +113,11 @@
 		"/home/gelie/Projects/ang2-api/app/configuration.ts",
 		"/home/gelie/Documents/Family Tree",
 		"/home/gelie/Projects/ang2-api/index.html",
-		"/home/gelie/Projects/ang2-api/package.json",
-		"/home/gelie/.config/sublime-text-3/Packages/User/Preferences.sublime-settings"
+		"/home/gelie/Projects/ang2-api/package.json"
 	],
 	"find":
 	{
-		"height": 25.0
+		"height": 37.0
 	},
 	"find_in_files":
 	{
@@ -96,9 +128,44 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": false,
+		"case_sensitive": true,
 		"find_history":
 		[
+			"Ryan Elie",
+			"Lynne",
+			"Lester",
+			"Myrtle",
+			"Irvin",
+			"Jamie",
+			"Jacky",
+			"Gavin",
+			"Nazley",
+			"Jacky",
+			"Emily",
+			"Alex",
+			"Ryan",
+			"Corbin",
+			"Ethan",
+			"Calem",
+			"Eustin",
+			"firstname",
+			"Match",
+			"MATCH",
+			"Match",
+			";",
+			")\"\n",
+			");\n",
+			";",
+			"sibling",
+			"', :'",
+			", :'",
+			"lastname",
+			"Elie",
+			"Ethan', lastname:'Elie",
+			"', lastname:'",
+			"firstname",
+			"post",
+			"get",
 			"-91108800",
 			"91108800",
 			"since",
@@ -111,6 +178,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"\"",
+			""
 		],
 		"reverse": false,
 		"show_context": true,
@@ -161,6 +230,10 @@
 	{
 		"height": 0.0
 	},
+	"output.exec":
+	{
+		"height": 114.0
+	},
 	"output.find_results":
 	{
 		"height": 0.0
@@ -169,7 +242,7 @@
 	"project": "my-family.sublime-project",
 	"replace":
 	{
-		"height": 46.0
+		"height": 66.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -203,10 +276,10 @@
 	"settings":
 	{
 	},
-	"show_minimap": true,
+	"show_minimap": false,
 	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": true,
+	"side_bar_visible": false,
 	"side_bar_width": 233.0,
 	"status_bar_visible": true,
 	"template_settings":
