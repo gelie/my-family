@@ -1,6 +1,6 @@
 """My Family App."""
 from flask import Flask, jsonify, request
-from flask.ext.restful import Api, Resource, fields, marshal, reqparse, abort
+from flask.ext.restful import Api, Resource, fields, marshal, reqparse
 from py2neo import Graph, authenticate
 import os
 import time
@@ -120,18 +120,32 @@ class PersonApi(Resource):
         """Delete a person and all his relations from the database."""
 
         query = "MATCH (n) WHERE id(n)={id} DETACH DELETE n"
-        result = graph.cypher.execute(query, {"id": id})
+        graph.cypher.execute(query, {"id": id})
         return jsonify({"message": "Record %d deleted!" % id})
 
 
 class ParentsListApi(Resource):
     """Retrieve a person's parents."""
 
+    def __init__(self):
+        """initialise parser."""
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str, required=True,
+                                   help='No name provided',
+                                   location='json')
+        self.reqparse.add_argument('dob', type=int, required=True,
+                                   help='Enter your date of birth ',
+                                   location='json')
+        self.reqparse.add_argument('sex', type=str, required=True,
+                                   help='Enter your sex',
+                                   location='json')
+        super(ParentsListApi, self).__init__()
+
     def get(self, id):
         """Retrieve a person's parents."""
         query = """
             MATCH (a:Person)<-[r:MOTHER_OF|FATHER_OF]-(b)
-            WHERE id(a)={id} 
+            WHERE id(a)={id}
             RETURN b.name, b.dob, b.sex, id(b)
             """
         result = graph.cypher.execute(query, {"id": id})
@@ -145,7 +159,32 @@ class ParentsListApi(Resource):
             else:
                 parents['father'] = person
         return {"parents": parents}
-        # return
+
+    def post(self, id):
+        """Add a person's parent."""
+
+        # check how many parents there are.
+        query = "MATCH (a:Person)<-[r:MOTHER_OF|FATHER_OF]-(b) WHERE id(a)={id} RETURN count(*) as count"
+        result = graph.cypher.execute(query, {"id": id})
+
+        if (result[0].count < 2):
+            person = {}
+            args = self.reqparse.parse_args()
+            for k, v in args.iteritems():
+                if v is not None:
+                    person[k] = v
+            tx = graph.cypher.begin()
+            query = "MERGE (parent:Person {name: {person}.name}) ON CREATE SET parent = {person} RETURN parent"
+            tx.append(query)
+            if person.sex == "M":
+                rel = "FATHER_OF"
+            else:
+                rel = "MOTHER_OF"
+            graph.cypher.execute(query, {"person": person})
+            tx.commit()
+            return jsonify({'person': person})
+        else:
+            return jsonify({'error': 'Person has 2 parents already!!'})
 
 api.add_resource(
     PersonListApi,

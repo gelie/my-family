@@ -251,3 +251,6 @@ MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)-[:SIBLING_OF]-(r:Person)-[:F
 
 //Return all persons in the db
 match (p:Person) return p.firstname + ' ' + p.lastname as Name order by p.firstname, p.lastname;
+
+//Count parents
+Match (a:Person {name:'Gavin Lester Elie'})<-[r:MOTHER_OF|FATHER_OF]-(b) return count(*);
