@@ -254,3 +254,6 @@ match (p:Person) return p.firstname + ' ' + p.lastname as Name order by p.firstn
 
 //Count parents
 Match (a:Person {name:'Gavin Lester Elie'})<-[r:MOTHER_OF|FATHER_OF]-(b) return count(*);
+
+//Create a parent
+MERGE (parent:Person {props}) RETURN parent
