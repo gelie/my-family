@@ -11,6 +11,7 @@ context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 context.load_cert_chain('/etc/nginx/ssl/nginx.crt', '/etc/nginx/ssl/nginx.key')
 
 app = Flask(__name__)
+app.config['BUNDLE_ERRORS'] = True
 api = Api(app)
 CORS(app)
 
@@ -29,6 +30,7 @@ person_fields = {
     'sex': fields.String,
     'parents': fields.Url('parents', absolute=True, scheme='https'),
     'siblings': fields.Url('siblings', absolute=True, scheme='https'),
+    'children': fields.Url('children', absolute=True, scheme='https'),
     'uri': fields.Url('person', absolute=True, scheme='https')
 }
 
@@ -60,22 +62,25 @@ class PersonListApi(Resource):
         result = graph.cypher.execute(query)
         output = []
         for x in result:
-            dob = time.strftime("%c", time.gmtime(x[1]))
+            # dob = time.strftime("%c", time.gmtime(x[1]))
             person = marshal(
-                {"name": x[0], "dob": dob, "sex": x[2],
+                {"name": x[0], "dob": x[1], "sex": x[2],
                  "id": x[3]}, person_fields)
             output.append(person)
         return {'persons': output}
 
     def post(self):
         """Create a new Person."""
-
+        person = {}
         args = self.reqparse.parse_args()
-        person = {
-            "name": args['name'],
-            "dob": args['dob'],
-            "sex": args['sex'],
-        }
+        # person = {
+        #     "name": args['name'],
+        #     "dob": args['dob'],
+        #     "sex": args['sex'],
+        # }
+        for k, v in args.items():
+            if v is not None:
+                person[k] = v
 
         query = """
             CREATE (p:Person {name: {name}, dob: {dob}, sex: {sex}})
@@ -83,7 +88,7 @@ class PersonListApi(Resource):
             """
         result = graph.cypher.execute(query, person)
         person['id'] = result[0][0]
-        person['dob'] = time.strftime("%c", time.gmtime(person['dob']))
+        # person['dob'] = result[0][1] # time.strftime("%c", time.gmtime(person['dob']))
         return {"person": marshal(person, person_fields)}
 
 
@@ -102,8 +107,8 @@ class PersonApi(Resource):
         result = graph.cypher.execute(
             "match(p: Person) where id(p)={id}\
             return p.name, p.dob, p.sex", {"id": id})
-        dob = time.strftime("%c", time.gmtime(result[0][1]))
-        person = {"name": result[0][0], "dob": dob,
+        # dob = time.strftime("%c", time.gmtime(result[0][1]))
+        person = {"name": result[0][0], "dob": result[0][1],
                   "sex": result[0][2], "id": id}
         return {'person': marshal(person, person_fields)}
 
@@ -152,15 +157,16 @@ class ParentListApi(Resource):
             RETURN b.name, b.dob, b.sex, id(b)
             """
         result = graph.cypher.execute(query, {"id": id})
-        parents = {}
+        parents = []
         for parent in result:
             person = {"name": parent[0], "dob": parent[
                 1], "sex": parent[2], "id": parent[3]}
             person = marshal(person, person_fields)
-            if parent[2] == "F":
-                parents['mother'] = person
-            elif parent[2] == "M":
-                parents['father'] = person
+            parents.append(person)
+            # if parent[2] == "F":
+            #     parents['mother'] = person
+            # elif parent[2] == "M":
+            #     parents['father'] = person
         return {"parents": parents}
 
     def post(self, id):
@@ -172,6 +178,10 @@ class ParentListApi(Resource):
 
         if len(result) == 0 or (result[0][0] < 2):
             args = self.reqparse.parse_args()
+            # try:
+            #     args = self.reqparse.parse_args()
+            # except:
+            #     return jsonify({'error': 'please supply name, dob, sex'})
             if args['sex'] == "M":
                 rel = "FATHER_OF"
             elif args['sex'] == "F":
@@ -193,6 +203,9 @@ class SiblingListApi(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str, required=True,
                                    help='No name provided',
+                                   location='json')
+        self.reqparse.add_argument('dob', type=int, required=True,
+                                   help='Enter your sex',
                                    location='json')
         self.reqparse.add_argument('sex', type=str, required=True,
                                    help='Enter your sex',
@@ -241,6 +254,38 @@ class SiblingListApi(Resource):
         graph.push(sibling)
         return jsonify({'message': 'Sibling has been added successfully.'})
 
+class ChildrenListApi(Resource):
+    """docstring for ChildrenListApi."""
+
+    def __init__(self):
+        """initialise parser."""
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str, required=True,
+                                   help='No name provided',
+                                   location='json')
+        self.reqparse.add_argument('dob', type=int, required=True,
+                                   help='Enter your date of birth ',
+                                   location='json')
+        self.reqparse.add_argument('sex', type=str, required=True,
+                                   help='Enter your sex',
+                                   location='json')
+        super(ChildrenListApi, self).__init__()
+        
+    def get(self, id):
+        query = """
+            MATCH (a:Person)-[r:MOTHER_OF|FATHER_OF]->(b:Person) 
+            WHERE id(a) = {id}
+            RETURN b.name as name, b.dob as dob, b.sex as sex, id(b) as id
+            """
+        result = graph.cypher.execute(query, {"id": id})
+        children = []
+        for child in result:
+            person = {"name": child.name, "dob": child.dob,
+                "sex": child.sex, "id": child.id}
+            person = marshal(person, person_fields) 
+            children.append(person)
+        return {"children": children}
+
 api.add_resource(
     PersonListApi,
     '/family/api/v1.0/persons',
@@ -260,6 +305,11 @@ api.add_resource(
     SiblingListApi,
     '/family/api/v1.0/persons/<int:id>/siblings',
     endpoint='siblings')
+
+api.add_resource(
+    ChildrenListApi,
+    '/family/api/v1.0/persons/<int:id>/children',
+    endpoint='children')
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True, ssl_context=context)
