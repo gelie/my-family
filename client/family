@@ -1,0 +1,259 @@
+Family Tree
+
+
+A person has a mother
+A person has a father
+A person can have zero or more siblings
+A family is a collection of people eg mother, father, children (role)
+
+Nodes
+  Person (name,dob,sex)
+  Family (name, description, since)
+
+Relationships
+# is_parent_of
+is_member_of (role in family)
+
+Questions
+  When was person born (dob)  *
+  How old is Person       *
+  Who is person's mother
+  Who is person's father
+  What family does person belong to
+  Who are person's sibblings eg brothers, sisters
+  Who are your uncles, aunts
+  Who are your cousins
+  Who are your children
+  Who are your nephews
+  Who are my nephews children
+
+------------------------------------------------------------------------------------------------------------------
+
+Sample Dataset
+
+Irvin dob -800798400
+Mrtle dob -674913600
+Lester dob 19828800
+Married -91108800
+
+//Create first family
+Create (gavin:Person {name:'Gavin', dob:-80827200, sex:'M'})
+Create (irvin:Person {name:'Irvin', dob:-800798400, sex:'M'})
+Create (myrtle:Person {name:'Myrtle', dob:-674913600, sex:'F'})
+Create (lester:Person {name:'Lester', dob:19828800, sex:'M'})
+Create (elie:Family {name:'Elie', description:'Marriage of Irvin & Myrtle', since:-91108800})
+
+# match (a:Person {name:'Irvin'}) merge (a)-[r:MEMBER_OF {role:'parent'}]->(b:Family {since:-91108800});
+
+match (a:Person {name:'Irvin'}), (b:Family {name:'Elie'}) merge (a)-[r:MEMBER_OF {role:'parent'}]->(b);
+match (a:Person {name:'Myrtle'}), (b:Family {name:'Elie'}) merge (a)-[r:MEMBER_OF {role:'parent'}]->(b);
+match (a:Person {name:'Gavin'}), (b:Family {name:'Elie'}) merge (a)-[r:MEMBER_OF {role:'child'}]->(b);
+match (a:Person {name:'Lester'}), (b:Family {name:'Elie'}) merge (a)-[r:MEMBER_OF {role:'child'}]->(b);
+
+// Create another family
+Create (jacky:Person {name:'Jacky', dob:26481600, sex:'F'});
+Create (ryan:Person {name:'Ryan', dob:1140696000, sex:'M'});
+Create (alex:Person {name:'Alex', dob:1228219200, sex:'M'});
+Create (emily:Person {name:'Emily', dob:1367236800, sex:'F'});
+Create (elie:Family {name:'Elie', description:'Marriage of Gavin & Jacky', since:1124539200});
+match (a:Person {name:'Jacky'}), (b:Family {since:1124539200}) merge (a)-[r:MEMBER_OF {role:'parent'}]->(b);
+match (a:Person {name:'Gavin'}), (b:Family {since:1124539200}) merge (a)-[r:MEMBER_OF {role:'parent'}]->(b);
+match (a:Person {name:'Ryan'}), (b:Family {since:1124539200}) merge (a)-[r:MEMBER_OF {role:'child'}]->(b);
+match (a:Person {name:'Alex'}), (b:Family {since:1124539200}) merge (a)-[r:MEMBER_OF {role:'child'}]->(b);
+match (a:Person {name:'Emily'}), (b:Family {since:1124539200}) merge (a)-[r:MEMBER_OF {role:'child'}]->(b);
+
+// Create another family (my aunt)
+Create (margie:Person {name:'Margaret', dob:-654868800, sex:'F'});
+Create (reggie:Person {name:'Reginald', dob:-946728000, sex:'M'});
+Create (leanne:Person {name:'Leanne', dob:402321600, sex:'F'});
+Create (mandy:Person {name:'Mandy', dob:577886400, sex:'F'});
+Create (paulsen:Family {name:'Paulsen', description:'Marriage of Reggie & Margie', since:70977600});
+match (a:Person {name:'Margaret'}), (b:Family {since:70977600}) merge (a)-[r:MEMBER_OF {role:'parent'}]->(b);
+match (a:Person {name:'Reginald'}), (b:Family {since:70977600}) merge (a)-[r:MEMBER_OF {role:'parent'}]->(b);
+match (a:Person {name:'Leanne'}), (b:Family {since:70977600}) merge (a)-[r:MEMBER_OF {role:'child'}]->(b);
+match (a:Person {name:'Mandy'}), (b:Family {since:70977600}) merge (a)-[r:MEMBER_OF {role:'child'}]->(b);
+
+// Create another family (my paternal grandparents)
+Create (ben:Person {name:'Benjamin', dob:-2177409600, sex:'M'});
+Create (carol:Person {name:'Caroline', dob:-2051179200, sex:'F'});
+Create (elie:Family {name:'Elie', description:'Marriage of Benjamin & Caroline', since:-1514721600});
+match (a:Person {name:'Benjamin'}), (b:Family {since:-1514721600}) merge (a)-[r:MEMBER_OF {role:'parent'}]->(b);
+match (a:Person {name:'Caroline'}), (b:Family {since:-1514721600}) merge (a)-[r:MEMBER_OF {role:'parent'}]->(b);
+match (a:Person {name:'Irvin'}), (b:Family {since:-1514721600}) merge (a)-[r:MEMBER_OF {role:'child'}]->(b);
+match (a:Person {name:'Margaret'}), (b:Family {since:-1514721600}) merge (a)-[r:MEMBER_OF {role:'child'}]->(b);
+
+//Create another family
+Create (brad:Person {name:'Bradley', dob:402321600, sex:'M'});
+Create (kate:Person {name:'Katelyn', dob:1136116800, sex:'F'});
+Create (nico:Person {name:'Nicolas', dob:1230811200, sex:'M'});
+Create (thebus:Family {name:'Thebus', description:'Marriage of Leanne & Bradley', since:1009886400});
+match (a:Person {name:'Bradley'}), (b:Family {since:1009886400}) merge (a)-[r:MEMBER_OF {role:'parent'}]->(b);
+match (a:Person {name:'Leanne'}), (b:Family {since:1009886400}) merge (a)-[r:MEMBER_OF {role:'parent'}]->(b);
+match (a:Person {name:'Katelyn'}), (b:Family {since:1009886400}) merge (a)-[r:MEMBER_OF {role:'child'}]->(b);
+match (a:Person {name:'Nicolas'}), (b:Family {since:1009886400}) merge (a)-[r:MEMBER_OF {role:'child'}]->(b);
+
+------------------------------------------------------------------------------------------------------------------
+
+Answer questions
+
+//Return my mother
+match (n:Person {sex:'F'})-[:MEMBER_OF {role:'parent'}]-(:Family {name:'Elie'}) return n
+
+//Return my parents
+match (n:Person)-[:MEMBER_OF {role:'parent'}]-(:Family {name:'Elie'}) return n
+
+//Return my brothers
+match (n:Person {sex:'M'})-[:MEMBER_OF {role:'child'}]-(:Family {name:'Elie'}) where n.name<>'Gavin' return n
+
+//Return my siblings
+match (n:Person)-[:MEMBER_OF {role:'child'}]-(:Family {name:'Elie'}) where n.name<>'Gavin' return n
+
+//Return all the families I belong to
+match (gavin:Person {name:'Gavin'})-[:MEMBER_OF]->(families) return gavin,families
+
+//Return family where I am a parent
+match (gavin:Person {name:'Gavin'})-[:MEMBER_OF {role:'parent'}]->(families) return gavin,families
+
+//Return family where I am a child
+match (gavin:Person {name:'Gavin'})-[:MEMBER_OF {role:'child'}]->(families) return gavin,families
+
+//Return all my children
+MATCH (gavin:Person {name:'Gavin'})-[:MEMBER_OF {role:'parent'}]->(f)<-[:MEMBER_OF {role:'child'}]-(children) RETURN children.name
+
+//Return my grandparents
+MATCH (p:Person)-[r:MEMBER_OF {role:'child'}]->(f:Family)<-[:MEMBER_OF {role:'parent'}]-(gp:Person) where p.name='Irvin' return gp.name;
+
+//Return my grandfather
+MATCH (p:Person)-[r:MEMBER_OF {role:'child'}]->(f:Family)<-[:MEMBER_OF {role:'parent'}]-(gp:Person {sex:'M'}) where p.name='Irvin' return gp.name;
+
+//Return my aunts
+MATCH (p:Person)-[r:MEMBER_OF {role:'child'}]->(f:Family)<-[:MEMBER_OF {role:'child'}]-(gp:Person) where p.name='Irvin' return gp.name;
+
+//Return cousins
+MATCH (p:Person)-[r:MEMBER_OF {role:'child'}]->(f:Family)<-[:MEMBER_OF {role:'child'}]-(gp:Person)-[:MEMBER_OF {role:'parent'}]->(:Family)<-[:MEMBER_OF {role:'child'}]-(n:Person) where p.name='Irvin' return n.name;
+
+OR BETTER STILL...
+
+MATCH (p:Person)-[r:MEMBER_OF {role:'child'}]->(f:Family)<-[:MEMBER_OF {role:'child'}]-(gp:Person)-[:MEMBER_OF {role:'parent'}]->(:Family)<-[:MEMBER_OF {role:'child'}]-(n:Person) where p.name='Irvin' return gp.name as Aunt_Uncle,collect(n.name) as Cousins,count(n) as Count;
+
+//Return nephews
+MATCH (p:Person)-[r:MEMBER_OF {role:'child'}]->(f:Family)<-[:MEMBER_OF {role:'child'}]-(gp:Person)-[:MEMBER_OF {role:'parent'}]->(:Family)<-[:MEMBER_OF {role:'child'}]-(n:Person)-[:MEMBER_OF {role:'parent'}]-(:Family)<-[:MEMBER_OF {role:'child'}]-(nc:Person) where p.name='Irvin' return nc.name;
+
+------------------------------------------------------------------------------------------------------------------
+
+Issues
+
+Fine tune data model.
+What makes a family unique?
+Decide on constraints.
+Decide on Person attributes.
+
+-----------------------------------------------------------------------------------------------------------------
+
+TAKE 2.....
+
+CREATE (n:Person {firstname:'Gavin',lastName:'Elie',dob:-80827200,sex:'M'});
+Create (n:Person {firstname:'Ryan', lastname:'Elie', dob:1140696000, sex:'M'});
+Create (n:Person {firstname:'Alex', lastname:'Elie', dob:1228219200, sex:'M'});
+Create (n:Person {firstname:'Emily', lastname:'Elie', dob:1367236800, sex:'M'});
+Create (n:Person {firstname:'Jacky', lastname:'Elie', dob:26481600, sex:'M'});
+Match (n:Person {firstname:'Gavin'}), (b:Person {firstname:'Ryan'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Gavin'}), (b:Person {firstname:'Alex'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Gavin'}), (b:Person {firstname:'Emily'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Jacky'}), (b:Person {firstname:'Ryan'}) merge (n)-[:MOTHER_OF]->(b);
+Match (n:Person {firstname:'Jacky'}), (b:Person {firstname:'Alex'}) merge (n)-[:MOTHER_OF]->(b);
+Match (n:Person {firstname:'Jacky'}), (b:Person {firstname:'Emily'}) merge (n)-[:MOTHER_OF]->(b);
+
+Create (irvin:Person {firstname:'Irvin', lastname:'Elie', dob:-800798400, sex:'M'});
+Create (myrtle:Person {firstname:'Myrtle', lastname:'Elie', dob:-674913600, sex:'F'});
+Create (lester:Person {firstname:'Lester', lastname:'Elie', dob:19828800, sex:'M'});
+Match (n:Person {firstname:'Irvin'}), (b:Person {firstname:'Gavin'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Myrtle'}), (b:Person {firstname:'Gavin'}) merge (n)-[:MOTHER_OF]->(b);
+Match (n:Person {firstname:'Irvin'}), (b:Person {firstname:'Lester'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Myrtle'}), (b:Person {firstname:'Lester'}) merge (n)-[:MOTHER_OF]->(b);
+
+Questions:
+Who are my parents?
+Match (a:Person {firstname:'Gavin'})<-[r]-(b) return b;
+
+Who is my father?
+Match (a:Person {firstname:'Gavin'})<-[r]-(b:Person {sex:'M'}) return b;
+
+Who is my mother?
+Match (a:Person {firstname:'Gavin'})<-[r:MOTHER_OF]-(b:Person {sex:'F'}) return b;
+
+Who are my children?
+Match (a:Person {firstname:'Gavin'})-[r:FATHER_OF]->(b) return b;
+Match (a:Person)-[r:FATHER_OF]->(b) WHERE a.firstname='Gavin'return b;
+
+Who are all the fathers?
+Match (a:Person)-[r:FATHER_OF]->() return a;
+
+Who are all the mothers?
+Match (a:Person)-[r:MOTHER_OF]->() return a;
+
+More DATA:
+Create (p:Person {firstname:'Jamie', lastname:'Lewis', dob:822052800, sex:'M'});
+Match (p1:Person {firstname:'Jamie'}),(p2:Person {firstname:'Jacky'})
+MERGE (p2)-[r:MOTHER_OF]->(p1)
+RETURN p2,p1;
+
+//create siblings relationships from mother/father sets
+MATCH (a:Person)<-[r1:FATHER_OF|MOTHER_OF]-(p:Person)-[r2:FATHER_OF|MOTHER_OF]->(b:Person) WHERE p.firstname IN ['Gavin','Jacky'] MERGE (a)-[r3:SIBLING_OF]-(b);
+
+MATCH (a:Person)<-[r1:FATHER_OF|MOTHER_OF]-(p:Person)-[r2:FATHER_OF|MOTHER_OF]->(b:Person) WHERE p.firstname IN ['Irvin','Myrtle'] MERGE (a)-[r3:SIBLING_OF]-(b);
+
+More QUESTIONS:
+
+Who are my brothers?
+MATCH (a:Person)-[r:SIBLING_OF]-(b:Person {sex:'M'}) WHERE a.firstname='Emily' RETURN b.firstname;
+MATCH (a:Person)-[r:SIBLING_OF]-(b:Person {sex:'M'}) WHERE a.firstname='Ryan' RETURN a.firstname as Me, b.firstname as Brothers;
+
+Who are my sisters?
+MATCH (a:Person)-[r:SIBLING_OF]-(b:Person {sex:'F'}) WHERE a.firstname='Ryan' RETURN b.firstname;
+
+Who are my siblings?
+MATCH (a:Person)-[r:SIBLING_OF]-(b:Person) WHERE a.firstname='Jamie' RETURN a.firstname as Me, b.firstname as Siblings;
+
+Who is my grandpa?
+MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)<-[:FATHER_OF]-(r:Person) WHERE n.firstname='Ryan' RETURN n.firstname, r.firstname as grandpa;
+
+Who is my grandma?
+MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)<-[:MOTHER_OF]-(r:Person) WHERE n.firstname='Ryan' RETURN n.firstname, r.firstname as grandma;
+
+Who is my grandparents?
+MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)<-[:FATHER_OF|MOTHER_OF]-(r:Person) WHERE n.firstname='Ryan' RETURN n.firstname, r.firstname as grandparent;
+
+Who is my uncles?
+MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)-[:SIBLING_OF]-(r:Person {sex:'M'}) WHERE n.firstname='Ryan' RETURN n.firstname, r.firstname as uncle;
+
+DATA:
+Create (p:Person {firstname:'Eustin', lastname:'Elie', dob:-22420800, sex:'M'});
+Create (p:Person {firstname:'Calem', lastname:'Elie', dob:-22420800, sex:'M'});
+Create (p:Person {firstname:'Ethan', lastname:'Elie', dob:-22420800, sex:'M'});
+Create (p:Person {firstname:'Corbin', lastname:'Elie', dob:-22420800, sex:'M'});
+Create (p:Person {firstname:'Nazley', lastname:'Elie', dob:-22420800, sex:'F'});
+Match (n:Person {firstname:'Eustin'}), (b:Person {firstname:'Calem'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Eustin'}), (b:Person {firstname:'Ethan'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Eustin'}), (b:Person {firstname:'Corbin'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Nazley'}), (b:Person {firstname:'Calem'}) merge (n)-[:MOTHER_OF]->(b);
+Match (n:Person {firstname:'Nazley'}), (b:Person {firstname:'Ethan'}) merge (n)-[:MOTHER_OF]->(b);
+Match (n:Person {firstname:'Nazley'}), (b:Person {firstname:'Corbin'}) merge (n)-[:MOTHER_OF]->(b);
+MATCH (a:Person)<-[r1:FATHER_OF|MOTHER_OF]-(p:Person)-[r2:FATHER_OF|MOTHER_OF]->(b:Person) WHERE p.firstname IN ['Eustin','Nazley'] MERGE (a)-[r3:SIBLING_OF]-(b);
+Match (n:Person {firstname:'Irvin'}), (b:Person {firstname:'Eustin'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Myrtle'}), (b:Person {firstname:'Eustin'}) merge (n)-[:MOTHER_OF]->(b);
+Create (p:Person {firstname:'Lynne', lastname:'Elie', dob:705412800, sex:'F'});
+Match (n:Person {firstname:'Irvin'}), (b:Person {firstname:'Lynne'}) merge (n)-[:FATHER_OF]->(b);
+Match (n:Person {firstname:'Myrtle'}), (b:Person {firstname:'Lynne'}) merge (n)-[:MOTHER_OF]->(b);
+
+Who are my cousins?
+MATCH (n:Person)<-[:FATHER_OF|MOTHER_OF]-(p:Person)-[:SIBLING_OF]-(r:Person)-[:FATHER_OF|MOTHER_OF]->(s:Person) WHERE n.firstname='Ryan' RETURN n.firstname, s.firstname as cousins;
+
+//Return all persons in the db
+match (p:Person) return p.firstname + ' ' + p.lastname as Name order by p.firstname, p.lastname;
+
+//Count parents
+Match (a:Person {name:'Gavin Lester Elie'})<-[r:MOTHER_OF|FATHER_OF]-(b) return count(*);
+
+//Create a parent
+MERGE (parent:Person {props}) RETURN parent

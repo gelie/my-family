@@ -1,0 +1,5 @@
+client/node_modules/
+client/typings/
+server/*.pyc
+server/env/
+npm-debug.log
