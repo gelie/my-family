@@ -1,6 +1,6 @@
 """My Family App."""
 from flask import Flask, jsonify, request
-from flask.ext.restful import Api, Resource, fields, marshal, reqparse
+from flask_restful import Api, Resource, fields, marshal, reqparse
 from py2neo import Graph, authenticate, Relationship
 from flask.ext.cors import CORS
 import os
