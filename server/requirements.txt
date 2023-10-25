@@ -10,7 +10,7 @@ MarkupSafe==2.1.2
 monotonic==1.6
 packaging==23.1
 pansi==2020.7.3
-py2neo==2021.2.3
+py2neo==2021.2.4
 Pygments==2.15.0
 pytz==2023.3
 six==1.16.0
