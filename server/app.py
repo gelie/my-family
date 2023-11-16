@@ -312,4 +312,4 @@ api.add_resource(
     endpoint='children')
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True, ssl_context=context)
+    app.run(host="0.0.0.0", port=5000, debug=False, ssl_context=context)
